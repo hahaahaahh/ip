@@ -4,7 +4,7 @@ public class Chimi {
         String line = "____________________________________________________________";
         Scanner scanner = new Scanner(System.in);
 
-        String[] tasks = new String[100];
+        Task[] tasks = new Task[100];
         int taskCount = 0;
 
         System.out.println(line);
@@ -19,14 +19,34 @@ public class Chimi {
                 System.out.println(" Bye. Hope to see you again soon!");
                 System.out.println(line);
                 break;
-            }   else if (input.equals("list")) {
+            }   else if (input.startsWith("list")) {
                 System.out.println(line);
                 for (int i = 0; i < taskCount; i++) {
                     System.out.println(" " + (i + 1) + ". " + tasks[i]);
                 }
                 System.out.println(line);
-            }   else {
-                tasks[taskCount] = input;
+            }   else if (input.startsWith("mark")) {
+                String[] parts = input.split(" ");
+                System.out.println(line);
+                int index = Integer.parseInt(parts[1]) - 1; // Convert 1-based to 0-based
+
+                tasks[index].markAsDone();
+
+                System.out.println(" Nice! I've marked this task as done:");
+                System.out.println("   " + tasks[index]);
+                System.out.println(line);
+            } else if (input.startsWith("unmark")) {
+                System.out.println(line);
+                String[] parts = input.split(" ");
+                int index = Integer.parseInt(parts[1]) - 1;
+
+                tasks[index].markAsUndone();
+
+                System.out.println(" OK, I've marked this task as not done yet:");
+                System.out.println("   " + tasks[index]);
+                System.out.println(line);
+            } else {
+                tasks[taskCount] = new Task(input);
                 taskCount++;
                 System.out.println(line);
                 System.out.println(" added: " + input);
