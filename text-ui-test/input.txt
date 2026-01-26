@@ -11,4 +11,5 @@ todo
 deadline
 
 event
+delete 1
 bye
