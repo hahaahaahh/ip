@@ -1,7 +1,12 @@
 import java.util.Scanner;
 import java.util.ArrayList;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class Chimi {
+    private static final String FILE_PATH = "./data/chimi.txt";
+
     public static void main(String[] args) {
         String line = "____________________________________________________________";
         Scanner scanner = new Scanner(System.in);
@@ -11,6 +16,12 @@ public class Chimi {
         System.out.println(" Hello! I'm Chimi");
         System.out.println(" What can I do for you?");
         System.out.println(line);
+
+        try {
+            loadTasks(tasks);
+        } catch (IOException e) {
+            System.out.println("Warning: Unable to load data: " + e.getMessage());
+        }
 
         while (true) {
             String input = scanner.nextLine();
@@ -86,9 +97,11 @@ public class Chimi {
 
             if (isDone) {
                 tasks.get(index).markAsDone();
+                saveTasks(tasks);
                 System.out.println(" Nice! I've marked this task as done:");
             } else {
                 tasks.get(index).markAsUndone();
+                saveTasks(tasks);
                 System.out.println(" OK, I've marked this task as not done yet:");
             }
             System.out.println("   " + tasks.get(index));
@@ -104,6 +117,7 @@ public class Chimi {
             int index = Integer.parseInt(parts[1]) - 1;
             if (index < 0 || index >= tasks.size()) throw new ChimiException("Task number is out of range.");
             Task removed = tasks.remove(index);
+            saveTasks(tasks);
             System.out.println(" Noted. I've removed this task:");
             System.out.println("   " + removed);
             System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
@@ -143,9 +157,73 @@ public class Chimi {
 
         if (newTask != null) {
             tasks.add(newTask);
+            saveTasks(tasks);
             System.out.println(" Got it. I've added this task:");
             System.out.println("   " + newTask);
             System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
+        }
+    }
+
+    private static void loadTasks(ArrayList<Task> tasks) throws IOException {
+        File file = new File(FILE_PATH);
+
+        // Handle file-does-not-exist
+        if (!file.exists()) {
+            return;
+        }
+
+        Scanner fileScanner = new Scanner(file);
+        while (fileScanner.hasNext()) {
+            String line = fileScanner.nextLine();
+            // Split by " | "
+            // Use regex " \\| " as | is a special character in regex
+            String[] parts = line.split(" \\| ");
+
+            // Simple corruption handling
+            if (parts.length < 3) continue; // Skip malformed lines
+
+            Task task = null;
+            switch (parts[0]) {
+                case "T":
+                    task = new Todo(parts[2]);
+                    break;
+                case "D":
+                    if (parts.length >= 4) task = new Deadline(parts[2], parts[3]);
+                    break;
+                case "E":
+                    if (parts.length >= 5) task = new Event(parts[2], parts[3], parts[4]);
+                    break;
+            }
+
+            if (task != null) {
+                if (parts[1].equals("1")) task.markAsDone();
+                tasks.add(task);
+            }
+        }
+        fileScanner.close();
+    }
+
+    private static void saveTasks(ArrayList<Task> tasks) {
+        try {
+            File file = new File(FILE_PATH);
+            File directory = file.getParentFile(); // Get the "./data/" directory
+
+            // Handle folder-does-not-exist
+            if (!directory.exists()) {
+                boolean created = directory.mkdirs(); // Capture the result
+                if (!created) {
+                    // If it failed to create, throw an error so we know why saving failed later
+                    throw new IOException("Failed to create data directory: " + directory.getAbsolutePath());
+                }
+            }
+
+            FileWriter fw = new FileWriter(file);
+            for (Task task : tasks) {
+                fw.write(task.toFileString() + System.lineSeparator());
+            }
+            fw.close();
+        } catch (IOException e) {
+            System.out.println("Error saving tasks: " + e.getMessage());
         }
     }
 }
