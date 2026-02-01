@@ -6,6 +6,10 @@ if not exist ..\bin mkdir ..\bin
 REM delete output from previous run
 if exist ACTUAL.TXT del ACTUAL.TXT
 
+REM delete the save file from previous run so we start fresh
+if exist data\chimi.txt del data\chimi.txt
+if exist ..\data\chimi.txt del ..\data\chimi.txt
+
 REM compile the code into the bin folder
 javac  -cp ..\src\main\java -Xlint:none -d ..\bin ..\src\main\java\*.java
 IF ERRORLEVEL 1 (

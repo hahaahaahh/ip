@@ -1,15 +1,13 @@
 todo read book
-deadline return book /by June 6th
+deadline return book /by 2019-06-06
 event project meeting /from Aug 6th 2pm /to 4pm
-deadline do homework /by no idea :-p
+deadline do homework /by 2021-10-15
+deadline this will fail /by Monday
 list
-mark 3
+mark 2
 list
-unmark 3
+unmark 2
 list
-todo
-deadline
-
-event
 delete 1
+list
 bye
