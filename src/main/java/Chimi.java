@@ -182,22 +182,28 @@ public class Chimi {
             // Simple corruption handling
             if (parts.length < 3) continue; // Skip malformed lines
 
-            Task task = null;
-            switch (parts[0]) {
-                case "T":
-                    task = new Todo(parts[2]);
-                    break;
-                case "D":
-                    if (parts.length >= 4) task = new Deadline(parts[2], parts[3]);
-                    break;
-                case "E":
-                    if (parts.length >= 5) task = new Event(parts[2], parts[3], parts[4]);
-                    break;
-            }
+            try {
+                Task task = null;
+                switch (parts[0]) {
+                    case "T":
+                        task = new Todo(parts[2]);
+                        break;
+                    case "D":
+                        // Throws ChimiException if date is invalid
+                        if (parts.length >= 4) task = new Deadline(parts[2], parts[3]);
+                        break;
+                    case "E":
+                        if (parts.length >= 5) task = new Event(parts[2], parts[3], parts[4]);
+                        break;
+                }
 
-            if (task != null) {
-                if (parts[1].equals("1")) task.markAsDone();
-                tasks.add(task);
+                if (task != null) {
+                    if (parts[1].equals("1")) task.markAsDone();
+                    tasks.add(task);
+                }
+            } catch (ChimiException e) {
+                // Ignore corrupted (bad date format)
+                System.out.println("Warning: Skipping corrupted line in data file: " + line);
             }
         }
         fileScanner.close();
