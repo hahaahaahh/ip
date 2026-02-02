@@ -1,3 +1,15 @@
+package chimi;
+
+import chimi.ui.Ui;
+import chimi.storage.Storage;
+import chimi.tasks.TaskList;
+import chimi.tasks.Task;
+import chimi.tasks.Todo;
+import chimi.tasks.Deadline;
+import chimi.tasks.Event;
+import chimi.parser.Parser;
+import chimi.commands.Command;
+
 public class Chimi {
 
     private final Storage storage;

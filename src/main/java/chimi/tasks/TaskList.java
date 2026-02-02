@@ -1,4 +1,7 @@
+package chimi.tasks;
+
 import java.util.ArrayList;
+import chimi.ChimiException;
 
 public class TaskList {
     private final ArrayList<Task> tasks;

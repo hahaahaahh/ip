@@ -1,7 +1,10 @@
+package chimi.tasks;
+
 import java.time.LocalDate;
 import java.util.Locale;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import chimi.ChimiException;
 
 public class Deadline extends Task {
 

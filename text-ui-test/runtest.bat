@@ -11,7 +11,9 @@ if exist data\chimi.txt del data\chimi.txt
 if exist ..\data\chimi.txt del ..\data\chimi.txt
 
 REM compile the code into the bin folder
-javac  -cp ..\src\main\java -Xlint:none -d ..\bin ..\src\main\java\*.java
+dir /s /B ..\src\main\java\*.java > sources.txt
+javac  -cp ..\src\main\java -Xlint:none -d ..\bin @sources.txt
+del sources.txt
 IF ERRORLEVEL 1 (
     echo ********** BUILD FAILURE **********
     exit /b 1
@@ -19,7 +21,7 @@ IF ERRORLEVEL 1 (
 REM no error here, errorlevel == 0
 
 REM run the program, feed commands from input.txt file and redirect the output to the ACTUAL.TXT
-java -classpath ..\bin Chimi < input.txt > ACTUAL.TXT
+java -classpath ..\bin chimi.Chimi < input.txt > ACTUAL.TXT
 
 REM compare the output to the expected output
 FC ACTUAL.TXT EXPECTED.TXT

@@ -1,3 +1,5 @@
+package chimi.commands;
+
 public enum Command {
     BYE,
     LIST,

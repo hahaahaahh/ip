@@ -1,11 +1,18 @@
+package chimi.storage;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
+import chimi.tasks.Task;
+import chimi.tasks.Todo;
+import chimi.tasks.Deadline;
+import chimi.tasks.Event;
+import chimi.ChimiException;
 
 public class Storage {
-    private String filePath;
+    private final String filePath;
 
     public Storage(String filePath) {
         this.filePath = filePath;
@@ -58,7 +65,9 @@ public class Storage {
         try {
             File file = new File(filePath);
             File directory = file.getParentFile();
-            if (!directory.exists()) directory.mkdirs();
+            if (directory != null && !directory.exists()) {
+                directory.mkdirs();
+            }
 
             FileWriter fw = new FileWriter(file);
             for (Task task : tasks) {
