@@ -34,6 +34,7 @@ application {
 shadowJar {
     archiveBaseName = "chimi"
     archiveClassifier = null
+    archiveFileName = 'chimi.jar'
 }
 
 run{
