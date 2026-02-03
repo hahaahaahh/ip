@@ -10,12 +10,22 @@ import chimi.tasks.Event;
 import chimi.parser.Parser;
 import chimi.commands.Command;
 
+/**
+ * The main entry point for the Chimi application.
+ * Chimi is a Personal Assistant Chatbot that helps manage tasks.
+ */
 public class Chimi {
 
     private final Storage storage;
     private TaskList tasks;
     private final Ui ui;
 
+    /**
+     * Constructs a new Chimi application instance.
+     * Initializes the UI, Storage, and attempts to load existing tasks.
+     *
+     * @param filePath The file path where tasks are stored.
+     */
     public Chimi(String filePath) {
         ui = new Ui();
         storage = new Storage(filePath);
@@ -27,6 +37,10 @@ public class Chimi {
         }
     }
 
+    /**
+     * Runs the main application loop.
+     * Handles user input, parses commands, executes them, and updates storage until the user exits.
+     */
     public void run() {
         ui.showWelcome();
         boolean isExit = false;
@@ -152,6 +166,11 @@ public class Chimi {
         }
     }
 
+    /**
+     * The main method to start the Chimi application.
+     *
+     * @param args Command line arguments (not used).
+     */
     public static void main(String[] args) {
         new Chimi("data/chimi.txt").run();
     }

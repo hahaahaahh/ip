@@ -11,13 +11,28 @@ import chimi.tasks.Deadline;
 import chimi.tasks.Event;
 import chimi.ChimiException;
 
+/**
+ * Handles the loading and saving of tasks to a file.
+ */
 public class Storage {
     private final String filePath;
 
+    /**
+     * Constructs a Storage object with a specific file path.
+     *
+     * @param filePath The file path where tasks are stored.
+     */
     public Storage(String filePath) {
         this.filePath = filePath;
     }
 
+    /**
+     * Loads tasks from the file.
+     * Parses the content of the file and converts it into a list of tasks.
+     *
+     * @return An ArrayList of Task objects loaded from the file.
+     * @throws ChimiException If an error occurs while reading the file.
+     */
     public ArrayList<Task> load() throws ChimiException {
         ArrayList<Task> tasks = new ArrayList<>();
         File file = new File(filePath);
@@ -61,6 +76,12 @@ public class Storage {
         return tasks;
     }
 
+    /**
+     * Saves the current list of tasks to the file.
+     * Overwrites the existing file with the current task data.
+     *
+     * @param tasks The list of tasks to be saved.
+     */
     public void save(ArrayList<Task> tasks) {
         try {
             File file = new File(filePath);

@@ -7,8 +7,17 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
+/**
+ * Tests for the {@link Parser} class.
+ * Verifies that commands are parsed correctly and exceptions are thrown for invalid inputs.
+ */
 public class ParserTest {
 
+    /**
+     * Tests that valid command strings are parsed into the correct Command enum values.
+     *
+     * @throws ChimiException If a command parsing error occurs unexpectedly.
+     */
     @Test
     public void parse_validCommand_success() throws ChimiException {
         // Test simple parsing
@@ -16,6 +25,9 @@ public class ParserTest {
         assertEquals(Command.BYE, Parser.parseCommand("bye"));
     }
 
+    /**
+     * Tests that invalid command strings throw a {@link ChimiException}.
+     */
     @Test
     public void parse_invalidCommand_exceptionThrown() {
         // Test that nonsense inputs throw exceptions
