@@ -1,5 +1,7 @@
 package chimi;
 
+import java.util.ArrayList;
+
 import chimi.ui.Ui;
 import chimi.storage.Storage;
 import chimi.tasks.TaskList;
@@ -99,9 +101,30 @@ public class Chimi {
                         handleAdd(fullCommand, command);
                         break;
 
-                    default:
-                        // This should not happen as Parser.parseCommand() validates commands
-                        throw new ChimiException("Unknown command.");
+                    case FIND:
+                        String[] fParts = fullCommand.split(" ", 2);
+                        if (fParts.length < 2) {
+                            throw new ChimiException("Please specify a keyword to search for.");
+                        }
+                        String keyword = fParts[1].trim();
+                        ArrayList<Task> found = tasks.findTasks(keyword);
+
+                        if (found.isEmpty()) {
+                            ui.showMessage("No matching tasks found.");
+                        } else {
+                            ui.showMessage("Here are the matching tasks in your list:");
+                            for (int i = 0; i < found.size(); i++) {
+                                // Note: We use the task's original index if we want,
+                                // but for simple search, just listing them 1, 2, 3 is fine.
+                                ui.showMessage((i + 1) + "." + found.get(i));
+                            }
+                        }
+                        break;
+
+                default:
+                    // This should not happen as Parser.parseCommand() validates commands
+                    throw new ChimiException("Unknown command.");
+
                 }
 
             } catch (ChimiException e) {
