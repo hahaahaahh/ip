@@ -54,15 +54,24 @@ public class Storage {
                             task = new Todo(parts[2]);
                             break;
                         case "D":
-                            if (parts.length >= 4) task = new Deadline(parts[2], parts[3]);
+                            if (parts.length >= 4) {
+                                task = new Deadline(parts[2], parts[3]);
+                            }
                             break;
                         case "E":
-                            if (parts.length >= 5) task = new Event(parts[2], parts[3], parts[4]);
+                            if (parts.length >= 5) {
+                                task = new Event(parts[2], parts[3], parts[4]);
+                            }
+                            break;
+                        default:
+                            System.out.println("Warning: Unknown task type '" + parts[0] + "' in file.");
                             break;
                     }
 
                     if (task != null) {
-                        if (parts[1].equals("1")) task.markAsDone();
+                        if (parts[1].equals("1")) {
+                            task.markAsDone();
+                        }
                         tasks.add(task);
                     }
                 } catch (ChimiException e) {

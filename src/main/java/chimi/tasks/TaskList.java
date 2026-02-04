@@ -43,7 +43,9 @@ public class TaskList {
      * @throws ChimiException If the index is out of range.
      */
     public Task delete(int index) throws ChimiException {
-        if (index < 0 || index >= tasks.size()) throw new ChimiException("Task number is out of range.");
+        if (index < 0 || index >= tasks.size()) {
+            throw new ChimiException("Task number is out of range.");
+        }
         return tasks.remove(index);
     }
 
@@ -55,7 +57,9 @@ public class TaskList {
      * @throws ChimiException If the index is out of range.
      */
     public Task get(int index) throws ChimiException {
-        if (index < 0 || index >= tasks.size()) throw new ChimiException("Task number is out of range.");
+        if (index < 0 || index >= tasks.size()) {
+            throw new ChimiException("Task number is out of range.");
+        }
         return tasks.get(index);
     }
 

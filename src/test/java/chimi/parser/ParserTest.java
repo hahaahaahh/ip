@@ -19,7 +19,7 @@ public class ParserTest {
      * @throws ChimiException If a command parsing error occurs unexpectedly.
      */
     @Test
-    public void parse_validCommand_success() throws ChimiException {
+    public void parseValidCommandSuccess() throws ChimiException {
         // Test simple parsing
         assertEquals(Command.TODO, Parser.parseCommand("todo read book"));
         assertEquals(Command.BYE, Parser.parseCommand("bye"));
@@ -29,7 +29,7 @@ public class ParserTest {
      * Tests that invalid command strings throw a {@link ChimiException}.
      */
     @Test
-    public void parse_invalidCommand_exceptionThrown() {
+    public void parseInvalidCommandExceptionThrown() {
         // Test that nonsense inputs throw exceptions
         try {
             Parser.parseCommand("blah blah blah");
