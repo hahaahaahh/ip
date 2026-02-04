@@ -10,12 +10,22 @@ import chimi.tasks.Event;
 import chimi.parser.Parser;
 import chimi.commands.Command;
 
+/**
+ * The main entry point for the Chimi application.
+ * Chimi is a Personal Assistant Chatbot that helps manage tasks.
+ */
 public class Chimi {
 
     private final Storage storage;
     private TaskList tasks;
     private final Ui ui;
 
+    /**
+     * Constructs a new Chimi application instance.
+     * Initializes the UI, Storage, and attempts to load existing tasks.
+     *
+     * @param filePath The file path where tasks are stored.
+     */
     public Chimi(String filePath) {
         ui = new Ui();
         storage = new Storage(filePath);
@@ -27,6 +37,10 @@ public class Chimi {
         }
     }
 
+    /**
+     * Runs the main application loop.
+     * Handles user input, parses commands, executes them, and updates storage until the user exits.
+     */
     public void run() {
         ui.showWelcome();
         boolean isExit = false;
@@ -64,7 +78,9 @@ public class Chimi {
 
                     case DELETE:
                         String[] dParts = fullCommand.split(" ");
-                        if (dParts.length < 2) throw new ChimiException("Please specify which task to delete.");
+                        if (dParts.length < 2) {
+                            throw new ChimiException("Please specify which task to delete.");
+                        }
                         try {
                             int dIdx = Integer.parseInt(dParts[1]) - 1;
                             Task deleted = tasks.delete(dIdx);
@@ -82,6 +98,10 @@ public class Chimi {
                     case EVENT:
                         handleAdd(fullCommand, command);
                         break;
+
+                    default:
+                        // This should not happen as Parser.parseCommand() validates commands
+                        throw new ChimiException("Unknown command.");
                 }
 
             } catch (ChimiException e) {
@@ -96,7 +116,9 @@ public class Chimi {
 
     private void handleMark(String fullCommand, boolean isDone) throws ChimiException {
         String[] parts = fullCommand.split(" ");
-        if (parts.length < 2) throw new ChimiException("Please specify which task to mark/unmark.");
+        if (parts.length < 2) {
+            throw new ChimiException("Please specify which task to mark/unmark.");
+        }
         try {
             int index = Integer.parseInt(parts[1]) - 1;
             Task task = tasks.get(index); // tasks.get() throws exception if out of range
@@ -120,27 +142,40 @@ public class Chimi {
         switch (command) {
             case TODO:
                 String tDesc = fullCommand.substring(4).trim();
-                if (tDesc.isEmpty()) throw new ChimiException("The description of a todo cannot be empty.");
+                if (tDesc.isEmpty()) {
+                    throw new ChimiException("The description of a todo cannot be empty.");
+                }
                 newTask = new Todo(tDesc);
                 break;
             case DEADLINE:
                 int byIndex = fullCommand.indexOf("/by");
-                if (byIndex == -1) throw new ChimiException("Deadlines must have a /by date.");
+                if (byIndex == -1) {
+                    throw new ChimiException("Deadlines must have a /by date.");
+                }
                 String dDesc = fullCommand.substring(8, byIndex).trim();
                 String by = fullCommand.substring(byIndex + 4).trim();
-                if (dDesc.isEmpty() || by.isEmpty()) throw new ChimiException("Description and date cannot be empty.");
+                if (dDesc.isEmpty() || by.isEmpty()) {
+                    throw new ChimiException("Description and date cannot be empty.");
+                }
                 newTask = new Deadline(dDesc, by);
                 break;
             case EVENT:
                 int fromIndex = fullCommand.indexOf("/from");
                 int toIndex = fullCommand.indexOf("/to");
-                if (fromIndex == -1 || toIndex == -1) throw new ChimiException("Events must have both /from and /to times.");
+                if (fromIndex == -1 || toIndex == -1) {
+                    throw new ChimiException("Events must have both /from and /to times.");
+                }
                 String eDesc = fullCommand.substring(5, fromIndex).trim();
                 String from = fullCommand.substring(fromIndex + 6, toIndex).trim();
                 String to = fullCommand.substring(toIndex + 4).trim();
-                if (eDesc.isEmpty()) throw new ChimiException("Description cannot be empty.");
+                if (eDesc.isEmpty()) {
+                    throw new ChimiException("Description cannot be empty.");
+                }
                 newTask = new Event(eDesc, from, to);
                 break;
+            default:
+                // This should not happen if called correctly, but required for checkstyle
+                throw new ChimiException("Unknown task type.");
         }
 
         if (newTask != null) {
@@ -152,6 +187,11 @@ public class Chimi {
         }
     }
 
+    /**
+    * The main method to start the Chimi application.
+    *
+    * @param args Command line arguments (not used).
+    */
     public static void main(String[] args) {
         new Chimi("data/chimi.txt").run();
     }
