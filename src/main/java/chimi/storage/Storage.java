@@ -100,11 +100,11 @@ public class Storage {
                 directory.mkdirs();
             }
 
-            FileWriter fw = new FileWriter(file);
+            FileWriter fileWriter = new FileWriter(file);
             for (Task task : tasks) {
-                fw.write(task.toFileString() + System.lineSeparator());
+                fileWriter.write(task.toFileString() + System.lineSeparator());
             }
-            fw.close();
+            fileWriter.close();
         } catch (IOException e) {
             System.out.println("Error saving tasks: " + e.getMessage());
         }

@@ -2,15 +2,15 @@ package chimi;
 
 import java.util.ArrayList;
 
-import chimi.ui.Ui;
-import chimi.storage.Storage;
-import chimi.tasks.TaskList;
-import chimi.tasks.Task;
-import chimi.tasks.Todo;
-import chimi.tasks.Deadline;
-import chimi.tasks.Event;
-import chimi.parser.Parser;
-import chimi.commands.Command;
+import chimi.commands.Command;       // 'c' comes first
+import chimi.parser.Parser;          // 'p' comes next
+import chimi.storage.Storage;        // 's' comes next
+import chimi.tasks.Deadline;         // 't', then 'd'
+import chimi.tasks.Event;            // 't', then 'e'
+import chimi.tasks.Task;             // 't', then 'Task'
+import chimi.tasks.TaskList;         // 't', then 'TaskL'
+import chimi.tasks.Todo;             // 't', then 'To'
+import chimi.ui.Ui;                  // 'u' comes last
 
 /**
  * The main entry point for the Chimi application.
@@ -79,13 +79,13 @@ public class Chimi {
                         break;
 
                     case DELETE:
-                        String[] dParts = fullCommand.split(" ");
-                        if (dParts.length < 2) {
+                        String[] deleteCommandParts = fullCommand.split(" ");
+                        if (deleteCommandParts.length < 2) {
                             throw new ChimiException("Please specify which task to delete.");
                         }
                         try {
-                            int dIdx = Integer.parseInt(dParts[1]) - 1;
-                            Task deleted = tasks.delete(dIdx);
+                            int deleteIndex = Integer.parseInt(deleteCommandParts[1]) - 1;
+                            Task deleted = tasks.delete(deleteIndex);
                             ui.showMessage("Noted. I've removed this task:");
                             ui.showMessage("  " + deleted);
                             ui.showMessage("Now you have " + tasks.size() + " tasks in the list.");
@@ -102,11 +102,11 @@ public class Chimi {
                         break;
 
                     case FIND:
-                        String[] fParts = fullCommand.split(" ", 2);
-                        if (fParts.length < 2) {
+                        String[] findCommandParts = fullCommand.split(" ", 2);
+                        if (findCommandParts.length < 2) {
                             throw new ChimiException("Please specify a keyword to search for.");
                         }
-                        String keyword = fParts[1].trim();
+                        String keyword = findCommandParts[1].trim();
                         ArrayList<Task> found = tasks.findTasks(keyword);
 
                         if (found.isEmpty()) {
@@ -138,12 +138,12 @@ public class Chimi {
     // Helper Methods
 
     private void handleMark(String fullCommand, boolean isDone) throws ChimiException {
-        String[] parts = fullCommand.split(" ");
-        if (parts.length < 2) {
+        String[] markCommandParts = fullCommand.split(" ");
+        if (markCommandParts.length < 2) {
             throw new ChimiException("Please specify which task to mark/unmark.");
         }
         try {
-            int index = Integer.parseInt(parts[1]) - 1;
+            int index = Integer.parseInt(markCommandParts[1]) - 1;
             Task task = tasks.get(index); // tasks.get() throws exception if out of range
 
             if (isDone) {
@@ -164,23 +164,23 @@ public class Chimi {
         Task newTask = null;
         switch (command) {
             case TODO:
-                String tDesc = fullCommand.substring(4).trim();
-                if (tDesc.isEmpty()) {
+                String todoDescription = fullCommand.substring(4).trim();
+                if (todoDescription.isEmpty()) {
                     throw new ChimiException("The description of a todo cannot be empty.");
                 }
-                newTask = new Todo(tDesc);
+                newTask = new Todo(todoDescription);
                 break;
             case DEADLINE:
                 int byIndex = fullCommand.indexOf("/by");
                 if (byIndex == -1) {
                     throw new ChimiException("Deadlines must have a /by date.");
                 }
-                String dDesc = fullCommand.substring(8, byIndex).trim();
-                String by = fullCommand.substring(byIndex + 4).trim();
-                if (dDesc.isEmpty() || by.isEmpty()) {
+                String deadlineDescription = fullCommand.substring(8, byIndex).trim();
+                String deadlineBy = fullCommand.substring(byIndex + 4).trim();
+                if (deadlineDescription.isEmpty() || deadlineBy.isEmpty()) {
                     throw new ChimiException("Description and date cannot be empty.");
                 }
-                newTask = new Deadline(dDesc, by);
+                newTask = new Deadline(deadlineDescription, deadlineBy);
                 break;
             case EVENT:
                 int fromIndex = fullCommand.indexOf("/from");
@@ -188,13 +188,13 @@ public class Chimi {
                 if (fromIndex == -1 || toIndex == -1) {
                     throw new ChimiException("Events must have both /from and /to times.");
                 }
-                String eDesc = fullCommand.substring(5, fromIndex).trim();
-                String from = fullCommand.substring(fromIndex + 6, toIndex).trim();
-                String to = fullCommand.substring(toIndex + 4).trim();
-                if (eDesc.isEmpty()) {
+                String eventDescription = fullCommand.substring(5, fromIndex).trim();
+                String eventFrom = fullCommand.substring(fromIndex + 6, toIndex).trim();
+                String eventTo = fullCommand.substring(toIndex + 4).trim();
+                if (eventDescription.isEmpty()) {
                     throw new ChimiException("Description cannot be empty.");
                 }
-                newTask = new Event(eDesc, from, to);
+                newTask = new Event(eventDescription, eventFrom, eventTo);
                 break;
             default:
                 // This should not happen if called correctly, but required for checkstyle
