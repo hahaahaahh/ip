@@ -1,11 +1,12 @@
 package chimi.parser;
 
-import chimi.ChimiException;
-import chimi.commands.Command; // Import Command enum
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
+
+import org.junit.jupiter.api.Test;
+
+import chimi.ChimiException;
+import chimi.commands.Command;
 
 /**
  * Tests for the {@link Parser} class.

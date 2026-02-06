@@ -5,11 +5,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
-import chimi.tasks.Task;
-import chimi.tasks.Todo;
+
+import chimi.ChimiException;
 import chimi.tasks.Deadline;
 import chimi.tasks.Event;
-import chimi.ChimiException;
+import chimi.tasks.Task;
+import chimi.tasks.Todo;
 
 /**
  * Handles the loading and saving of tasks to a file.

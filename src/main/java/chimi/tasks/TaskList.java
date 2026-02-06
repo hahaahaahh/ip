@@ -1,6 +1,7 @@
 package chimi.tasks;
 
 import java.util.ArrayList;
+
 import chimi.ChimiException;
 
 /**

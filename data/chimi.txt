@@ -1,1 +1,1 @@
-T | 0 | read book
+D | 0 | read novel | 2027-12-12
