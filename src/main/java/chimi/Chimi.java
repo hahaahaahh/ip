@@ -86,9 +86,11 @@ public class Chimi {
                         try {
                             int deleteIndex = Integer.parseInt(deleteCommandParts[1]) - 1;
                             Task deleted = tasks.delete(deleteIndex);
-                            ui.showMessage("Noted. I've removed this task:");
-                            ui.showMessage("  " + deleted);
-                            ui.showMessage("Now you have " + tasks.size() + " tasks in the list.");
+                            ui.showMessage(
+                                    "Noted. I've removed this task:",
+                                    "  " + deleted,
+                                    "Now you have " + tasks.size() + " tasks in the list."
+                            );
                             storage.save(tasks.getAllTasks());
                         } catch (NumberFormatException e) {
                             throw new ChimiException("Please enter a valid number.");

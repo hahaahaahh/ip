@@ -30,11 +30,11 @@ public class Ui {
      * Displays the welcome message to the user.
      */
     public void showWelcome() {
-        System.out.println(LINE);
-        System.out.println(" Hello! I'm Chimi");
-        System.out.println(" What can I do for you?");
-        System.out.println(LINE);
+        showLine();
+        showMessage("Hello! I'm Chimi", "What can I do for you?");
+        showLine();
     }
+
 
     /**
      * Displays a horizontal separator line.
@@ -60,11 +60,13 @@ public class Ui {
     }
 
     /**
-     * Displays a generic message to the user.
+     * Displays generic messages to the user.
      *
-     * @param message The message to display.
+     * @param messages The messages to display.
      */
-    public void showMessage(String message) {
-        System.out.println(" " + message);
+    public void showMessage(String... messages) {
+        for (String message : messages) {
+            System.out.println(" " + message);
+        }
     }
 }
