@@ -71,11 +71,11 @@ public class Chimi {
                         break;
 
                     case MARK:
-                        handleMark(fullCommand, true);
+                        ui.showMessage(handleMark(fullCommand, true));
                         break;
 
                     case UNMARK:
-                        handleMark(fullCommand, false);
+                        ui.showMessage(handleMark(fullCommand, false));
                         break;
 
                     case DELETE:
@@ -98,7 +98,7 @@ public class Chimi {
                     case TODO:
                     case DEADLINE:
                     case EVENT:
-                        handleAdd(fullCommand, command);
+                        ui.showMessage(handleAdd(fullCommand, command));
                         break;
 
                     case FIND:
@@ -137,7 +137,7 @@ public class Chimi {
 
     // Helper Methods
 
-    private void handleMark(String fullCommand, boolean isDone) throws ChimiException {
+    private String handleMark(String fullCommand, boolean isDone) throws ChimiException {
         String[] markCommandParts = fullCommand.split(" ");
         if (markCommandParts.length < 2) {
             throw new ChimiException("Please specify which task to mark/unmark.");
@@ -146,21 +146,23 @@ public class Chimi {
             int index = Integer.parseInt(markCommandParts[1]) - 1;
             Task task = tasks.get(index); // tasks.get() throws exception if out of range
 
+            StringBuilder response = new StringBuilder();
             if (isDone) {
                 task.markAsDone();
-                ui.showMessage("Nice! I've marked this task as done:");
+                response.append("Nice! I've marked this task as done:\n");
             } else {
                 task.markAsUndone();
-                ui.showMessage("OK, I've marked this task as not done yet:");
+                response.append("OK, I've marked this task as not done yet:\n");
             }
-            ui.showMessage("  " + task);
+            response.append("  ").append(task);
             storage.save(tasks.getAllTasks());
+            return response.toString();
         } catch (NumberFormatException e) {
             throw new ChimiException("Please enter a valid number.");
         }
     }
 
-    private void handleAdd(String fullCommand, Command command) throws ChimiException {
+    private String handleAdd(String fullCommand, Command command) throws ChimiException {
         Task newTask = null;
         switch (command) {
             case TODO:
@@ -203,10 +205,86 @@ public class Chimi {
 
         if (newTask != null) {
             tasks.add(newTask);
-            ui.showMessage("Got it. I've added this task:");
-            ui.showMessage("  " + newTask);
-            ui.showMessage("Now you have " + tasks.size() + " tasks in the list.");
             storage.save(tasks.getAllTasks());
+            return "Got it. I've added this task:\n" +
+                   "  " + newTask + "\n" +
+                   "Now you have " + tasks.size() + " tasks in the list.";
+        }
+        return "";
+    }
+
+    /**
+     * Generates a response for the user's chat message.
+     */
+    public String getResponse(String input) {
+        try {
+            Command command = Parser.parseCommand(input);
+
+            switch (command) {
+            case BYE:
+                return "Bye. Hope to see you again soon!";
+
+            case LIST:
+                if (tasks.size() == 0) {
+                    return "No tasks added yet!";
+                } else {
+                    StringBuilder sb = new StringBuilder("Here are the tasks in your list:\n");
+                    for (int i = 0; i < tasks.size(); i++) {
+                        sb.append(i + 1).append(".").append(tasks.get(i)).append("\n");
+                    }
+                    return sb.toString();
+                }
+
+            case MARK:
+                return handleMark(input, true);
+
+            case UNMARK:
+                return handleMark(input, false);
+
+            case DELETE:
+                String[] deleteCommandParts = input.split(" ");
+                if (deleteCommandParts.length < 2) {
+                    throw new ChimiException("Please specify which task to delete.");
+                }
+                try {
+                    int deleteIndex = Integer.parseInt(deleteCommandParts[1]) - 1;
+                    Task deleted = tasks.delete(deleteIndex);
+                    storage.save(tasks.getAllTasks());
+                    return "Noted. I've removed this task:\n" +
+                            "  " + deleted + "\n" +
+                            "Now you have " + tasks.size() + " tasks in the list.";
+                } catch (NumberFormatException e) {
+                    throw new ChimiException("Please enter a valid number.");
+                }
+
+            case TODO:
+            case DEADLINE:
+            case EVENT:
+                return handleAdd(input, command);
+
+            case FIND:
+                String[] findCommandParts = input.split(" ", 2);
+                if (findCommandParts.length < 2) {
+                    throw new ChimiException("Please specify a keyword to search for.");
+                }
+                String keyword = findCommandParts[1].trim();
+                ArrayList<Task> found = tasks.findTasks(keyword);
+
+                if (found.isEmpty()) {
+                    return "No matching tasks found.";
+                } else {
+                    StringBuilder sb = new StringBuilder("Here are the matching tasks in your list:\n");
+                    for (int i = 0; i < found.size(); i++) {
+                        sb.append(i + 1).append(".").append(found.get(i)).append("\n");
+                    }
+                    return sb.toString();
+                }
+
+            default:
+                throw new ChimiException("Unknown command.");
+            }
+        } catch (ChimiException e) {
+            return "Error: " + e.getMessage();
         }
     }
 
@@ -219,3 +297,4 @@ public class Chimi {
         new Chimi("data/chimi.txt").run();
     }
 }
+

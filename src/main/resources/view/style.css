@@ -1,0 +1,24 @@
+#mainPane {
+    -fx-background-image: url("/images/background.jpg");
+    -fx-background-size: cover;
+}
+
+.scroll-pane {
+    -fx-background: transparent;
+    -fx-background-color: transparent;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+#dialogContainer {
+    -fx-background-color: transparent;
+}
+
+.dialog-label {
+    -fx-text-fill: black;
+    -fx-background-color: rgba(255, 255, 255, 0.9);
+    -fx-padding: 10;
+    -fx-background-radius: 10;
+}
