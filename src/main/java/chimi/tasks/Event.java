@@ -29,7 +29,7 @@ public class Event extends Task {
      */
     @Override
     public String toFileString() {
-        return "E" + super.toFileString() + " | " + from + " | " + to;
+        return "E" + super.toFileString() + FILE_SEPARATOR + from + FILE_SEPARATOR + to;
     }
 
     /**
