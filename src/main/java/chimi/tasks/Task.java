@@ -71,5 +71,21 @@ public class Task {
     public String getDescription() {
         return description;
     }
-}
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Task task = (Task) obj;
+        return description.equals(task.description);
+    }
+
+    @Override
+    public int hashCode() {
+        return description.hashCode();
+    }
+}

@@ -51,4 +51,20 @@ public class Deadline extends Task {
     public String toFileString() {
         return "D" + super.toFileString() + FILE_SEPARATOR + byDate;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!super.equals(obj)) {
+            return false;
+        }
+        Deadline deadline = (Deadline) obj;
+        return byDate.equals(deadline.byDate);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + byDate.hashCode();
+        return result;
+    }
 }

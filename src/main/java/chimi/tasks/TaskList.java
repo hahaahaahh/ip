@@ -32,8 +32,12 @@ public class TaskList {
      * Adds a task to the list.
      *
      * @param task The task to add.
+     * @throws ChimiException If the task already exists in the list.
      */
-    public void add(Task task) {
+    public void add(Task task) throws ChimiException {
+        if (tasks.contains(task)) {
+            throw new ChimiException("Hold on! This exact task already exists in your list.");
+        }
         tasks.add(task);
     }
 
