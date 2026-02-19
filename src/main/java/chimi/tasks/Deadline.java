@@ -49,6 +49,6 @@ public class Deadline extends Task {
      */
     @Override
     public String toFileString() {
-        return "D" + super.toFileString() + " | " + byDate;
+        return "D" + super.toFileString() + FILE_SEPARATOR + byDate;
     }
 }

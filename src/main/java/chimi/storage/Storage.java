@@ -1,6 +1,7 @@
 package chimi.storage;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -21,12 +22,15 @@ import chimi.tasks.Todo;
 public class Storage {
     private final String filePath;
 
+    private static final String SEPARATOR = " \\| ";
+
     /**
      * Constructs a Storage object with a specific file path.
      *
      * @param filePath The file path where tasks are stored.
      */
     public Storage(String filePath) {
+        assert filePath != null && !filePath.trim().isEmpty() : "File path cannot be null or empty";
         this.filePath = filePath;
     }
 
@@ -45,48 +49,59 @@ public class Storage {
             return tasks; // Return empty list if file doesn't exist
         }
 
-        try {
-            Scanner fileScanner = new Scanner(file);
+        try (Scanner fileScanner = new Scanner(file)) {
             while (fileScanner.hasNext()) {
                 String line = fileScanner.nextLine();
-                String[] parts = line.split(" \\| ");
-
                 try {
-                    Task task = null;
-                    switch (parts[0]) {
-                        case "T":
-                            task = new Todo(parts[2]);
-                            break;
-                        case "D":
-                            if (parts.length >= 4) {
-                                task = new Deadline(parts[2], parts[3]);
-                            }
-                            break;
-                        case "E":
-                            if (parts.length >= 5) {
-                                task = new Event(parts[2], parts[3], parts[4]);
-                            }
-                            break;
-                        default:
-                            System.out.println("Warning: Unknown task type '" + parts[0] + "' in file.");
-                            break;
-                    }
-
+                    Task task = parseTask(line);
                     if (task != null) {
-                        if (parts[1].equals("1")) {
-                            task.markAsDone();
-                        }
                         tasks.add(task);
                     }
-                } catch (ChimiException e) {
-                    System.out.println("Warning: Skipping corrupted line.");
+                } catch (ChimiException | IllegalArgumentException e) {
+                    System.err.println("Warning: Skipping corrupted line: " + line);
                 }
             }
-            fileScanner.close();
         } catch (IOException e) {
-            throw new ChimiException("Error loading file.");
+            throw new ChimiException("Error loading file: " + e.getMessage());
         }
         return tasks;
+    }
+
+    private Task parseTask(String line) throws ChimiException {
+        String[] parts = line.split(SEPARATOR);
+        if (parts.length < 3) {
+            throw new ChimiException("Invalid line format.");
+        }
+
+        String type = parts[0];
+        boolean isDone = parts[1].equals("1");
+        String description = parts[2];
+
+        Task task;
+        switch (type) {
+            case "T":
+                task = new Todo(description);
+                break;
+            case "D":
+                if (parts.length < 4) {
+                    throw new ChimiException("Invalid deadline format.");
+                }
+                task = new Deadline(description, parts[3]);
+                break;
+            case "E":
+                if (parts.length < 5) {
+                    throw new ChimiException("Invalid event format.");
+                }
+                task = new Event(description, parts[3], parts[4]);
+                break;
+            default:
+                throw new ChimiException("Unknown task type: " + type);
+        }
+
+        if (isDone) {
+            task.markAsDone();
+        }
+        return task;
     }
 
     /**
@@ -110,7 +125,7 @@ public class Storage {
                     .collect(Collectors.toList());
             Files.write(Paths.get(filePath), lines);
         } catch (IOException e) {
-            System.out.println("Error saving tasks: " + e.getMessage());
+            System.err.println("Error saving tasks: " + e.getMessage());
         }
     }
 }

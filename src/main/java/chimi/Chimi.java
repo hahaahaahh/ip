@@ -53,6 +53,7 @@ public class Chimi {
             try {
                 String fullCommand = ui.readCommand();
                 ui.showLine();
+                Command command = Parser.parseCommand(fullCommand);
 
                 // Logic delegated to getResponse to avoid duplication
                 String response = getResponse(fullCommand);
