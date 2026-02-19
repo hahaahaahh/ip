@@ -165,6 +165,9 @@ public class Chimi {
     }
 
     private String handleAdd(String fullCommand, Command command) throws ChimiException {
+        assert command == Command.TODO || command == Command.DEADLINE || command == Command.EVENT
+                : "handleAdd should only be called for TODO, DEADLINE, or EVENT commands";
+
         Task newTask = null;
         switch (command) {
             case TODO:
