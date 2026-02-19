@@ -13,10 +13,12 @@ import javafx.stage.Stage;
  */
 public class Main extends Application {
 
-    private Chimi chimi = new Chimi("data/chimi.txt");
+    private final Chimi chimi = new Chimi("data/chimi.txt");
 
     @Override
     public void start(Stage stage) {
+        assert chimi != null : "Chimi instance should be initialized before the UI starts";
+
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/view/MainWindow.fxml"));
             AnchorPane ap = fxmlLoader.load();
