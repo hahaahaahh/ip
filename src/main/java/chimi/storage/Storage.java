@@ -3,8 +3,12 @@ package chimi.storage;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 import chimi.ChimiException;
 import chimi.tasks.Deadline;
@@ -116,11 +120,10 @@ public class Storage {
                 directory.mkdirs();
             }
 
-            try (FileWriter fileWriter = new FileWriter(file)) {
-                for (Task task : tasks) {
-                    fileWriter.write(task.toFileString() + System.lineSeparator());
-                }
-            }
+            List<String> lines = tasks.stream()
+                    .map(Task::toFileString)
+                    .collect(Collectors.toList());
+            Files.write(Paths.get(filePath), lines);
         } catch (IOException e) {
             System.err.println("Error saving tasks: " + e.getMessage());
         }

@@ -1,6 +1,8 @@
 package chimi;
 
 import java.util.ArrayList;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import chimi.commands.Command;       // 'c' comes first
 import chimi.parser.Parser;          // 'p' comes next
@@ -41,7 +43,7 @@ public class Chimi {
 
     /**
      * Runs the main application loop.
-     * Handles user input, parses commands, executes them, and updates storage until the user exits.
+     * Handles user input by delegating logic to getResponse().
      */
     public void run() {
         ui.showWelcome();
@@ -53,13 +55,13 @@ public class Chimi {
                 ui.showLine();
                 Command command = Parser.parseCommand(fullCommand);
 
-                if (command == Command.BYE) {
-                    isExit = true;
-                }
-
+                // Logic delegated to getResponse to avoid duplication
                 String response = getResponse(fullCommand);
                 ui.showMessage(response);
 
+                if (Parser.parseCommand(fullCommand) == Command.BYE) {
+                    isExit = true;
+                }
             } catch (ChimiException e) {
                 ui.showError(e.getMessage());
             } finally {
@@ -69,7 +71,11 @@ public class Chimi {
     }
 
     /**
-     * Generates a response for the user's chat message.
+     * Generates a response for the user's input.
+     * Used by both the logic CLI loop and the GUI.
+     *
+     * @param input The raw command string from the user.
+     * @return The response string to display.
      */
     public String getResponse(String input) {
         try {
@@ -82,7 +88,6 @@ public class Chimi {
                 case DELETE -> handleDelete(input);
                 case FIND -> handleFind(input);
                 case TODO, DEADLINE, EVENT -> handleAdd(input, command);
-                default -> throw new ChimiException("Unknown command.");
             };
         } catch (ChimiException e) {
             return "Error: " + e.getMessage();
@@ -91,46 +96,24 @@ public class Chimi {
 
     // --- Command Handlers ---
 
-    /**
-     * Handles the list command.
-     *
-     * @return The formatted list of tasks.
-     * @throws ChimiException If there is an error retrieving tasks.
-     */
-    private String handleList() throws ChimiException {
+    private String handleList() {
         if (tasks.size() == 0) {
             return "No tasks added yet!";
         }
-        StringBuilder sb = new StringBuilder("Here are the tasks in your list:\n");
-        for (int i = 0; i < tasks.size(); i++) {
-            sb.append(i + 1).append(".").append(tasks.get(i)).append("\n");
-        }
-        return sb.toString();
+        // Stream Usage: Generate formatted list strings
+        String tasksString = IntStream.range(0, tasks.size())
+                .mapToObj(i -> {
+                    try {
+                        return (i + 1) + "." + tasks.get(i);
+                    } catch (ChimiException e) {
+                        return (i + 1) + ". Error retrieving task";
+                    }
+                })
+                .collect(Collectors.joining("\n"));
+
+        return "Here are the tasks in your list:\n" + tasksString;
     }
 
-    /**
-     * Handles the delete command.
-     *
-     * @param input The full user input.
-     * @return The response message.
-     * @throws ChimiException If the index is invalid.
-     */
-    private String handleDelete(String input) throws ChimiException {
-        int index = parseIndex(input);
-        Task deleted = tasks.delete(index);
-        storage.save(tasks.getAllTasks());
-        return "Noted. I've removed this task:\n" +
-               "  " + deleted + "\n" +
-               "Now you have " + tasks.size() + " tasks in the list.";
-    }
-
-    /**
-     * Handles the find command.
-     *
-     * @param input The full user input.
-     * @return The response message with matching tasks.
-     * @throws ChimiException If the keyword is missing.
-     */
     private String handleFind(String input) throws ChimiException {
         String[] parts = input.split(" ", 2);
         if (parts.length < 2) {
@@ -142,36 +125,47 @@ public class Chimi {
         if (found.isEmpty()) {
             return "No matching tasks found.";
         }
-        StringBuilder sb = new StringBuilder("Here are the matching tasks in your list:\n");
-        for (int i = 0; i < found.size(); i++) {
-            sb.append(i + 1).append(".").append(found.get(i)).append("\n");
-        }
-        return sb.toString();
+
+        // Stream Usage: Generate formatted list strings for found tasks
+        String foundString = IntStream.range(0, found.size())
+                .mapToObj(i -> (i + 1) + "." + found.get(i))
+                .collect(Collectors.joining("\n"));
+
+        return "Here are the matching tasks in your list:\n" + foundString;
     }
 
-    /**
-     * Handles the mark and unmark commands.
-     *
-     * @param input The full user input.
-     * @param isDone True to mark as done, false to unmark.
-     * @return The response message.
-     * @throws ChimiException If the index is invalid.
-     */
+    private String handleDelete(String input) throws ChimiException {
+        int index = parseIndex(input);
+        // Validate index range
+        if (index < 0 || index >= tasks.size()) {
+            throw new ChimiException("Task number is out of range.");
+        }
+        Task deleted = tasks.delete(index);
+        storage.save(tasks.getAllTasks());
+        return "Noted. I've removed this task:\n" +
+               "  " + deleted + "\n" +
+               "Now you have " + tasks.size() + " tasks in the list.";
+    }
+
     private String handleMark(String input, boolean isDone) throws ChimiException {
         int index = parseIndex(input);
-        Task task = tasks.get(index);
-
-        String statusMsg;
-        if (isDone) {
-            task.markAsDone();
-            statusMsg = "Nice! I've marked this task as done:\n";
-        } else {
-            task.markAsUndone();
-            statusMsg = "OK, I've marked this task as not done yet:\n";
+        // Validate index range
+        if (index < 0 || index >= tasks.size()) {
+            throw new ChimiException("Task number is out of range.");
         }
 
+        Task task = tasks.get(index);
+        if (isDone) {
+            task.markAsDone();
+        } else {
+            task.markAsUndone();
+        }
         storage.save(tasks.getAllTasks());
-        return statusMsg + "  " + task;
+
+        String statusMsg = isDone
+                ? "Nice! I've marked this task as done:"
+                : "OK, I've marked this task as not done yet:";
+        return statusMsg + "\n  " + task;
     }
 
     private int parseIndex(String input) throws ChimiException {
@@ -186,14 +180,6 @@ public class Chimi {
         }
     }
 
-    /**
-     * Handles adding new tasks (todo, deadline, event).
-     *
-     * @param input The full user input.
-     * @param command The command type.
-     * @return The response message.
-     * @throws ChimiException If the task details are invalid.
-     */
     private String handleAdd(String input, Command command) throws ChimiException {
         assert command == Command.TODO || command == Command.DEADLINE || command == Command.EVENT
                : "handleAdd should only be called for TODO, DEADLINE, or EVENT commands";
@@ -202,7 +188,7 @@ public class Chimi {
             case TODO -> createTodo(input);
             case DEADLINE -> createDeadline(input);
             case EVENT -> createEvent(input);
-            default -> throw new ChimiException("Unknown task type for add.");
+            default -> throw new ChimiException("Unknown task type.");
         };
 
         tasks.add(newTask);
@@ -251,10 +237,10 @@ public class Chimi {
     }
 
     /**
-    * The main method to start the Chimi application.
-    *
-    * @param args Command line arguments (not used).
-    */
+     * The main method to start the Chimi application.
+     *
+     * @param args Command line arguments (not used).
+     */
     public static void main(String[] args) {
         new Chimi("data/chimi.txt").run();
     }

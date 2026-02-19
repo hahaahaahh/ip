@@ -1,6 +1,7 @@
 package chimi.tasks;
 
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 import chimi.ChimiException;
 
@@ -83,12 +84,8 @@ public class TaskList {
     }
 
     public ArrayList<Task> findTasks(String keyword) {
-        ArrayList<Task> matchingTasks = new ArrayList<>();
-        for (Task task : tasks) {
-            if (task.getDescription().contains(keyword)) { // Basic string matching
-                matchingTasks.add(task);
-            }
-        }
-        return matchingTasks;
+        return tasks.stream()
+                .filter(task -> task.getDescription().contains(keyword))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 }
