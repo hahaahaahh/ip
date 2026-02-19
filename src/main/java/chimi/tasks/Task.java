@@ -18,13 +18,16 @@ public class Task {
         this.isDone = false;
     }
 
+    /** The separator used for file storage format. */
+    public static final String FILE_SEPARATOR = " | ";
+
     /**
      * Formats the task as a string for file storage.
      *
      * @return A string representation of the task for file storage.
      */
     public String toFileString() {
-        return " | " + (isDone ? "1" : "0") + " | " + description;
+        return FILE_SEPARATOR + (isDone ? "1" : "0") + FILE_SEPARATOR + description;
     }
 
     /**

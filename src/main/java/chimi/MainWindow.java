@@ -31,8 +31,8 @@ public class MainWindow extends AnchorPane {
     }
 
     /** Injects the Chimi instance */
-    public void setChimi(Chimi c) {
-        chimi = c;
+    public void setChimi(Chimi chimi) {
+        this.chimi = chimi;
     }
 
     /**
