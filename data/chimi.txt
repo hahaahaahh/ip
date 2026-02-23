@@ -1,4 +1,4 @@
-T | 0 | read novel /by 2017-12-12
+T | 1 | read novel /by 2017-12-12
 T | 0 | read book
 D | 0 | return book | 2025-09-15
 E | 0 | project meeting | Mon 2pm | 4pm
