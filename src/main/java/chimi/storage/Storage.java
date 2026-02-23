@@ -67,31 +67,34 @@ public class Storage {
     }
 
     private Task parseTask(String line) throws ChimiException {
-        String[] parts = line.split(SEPARATOR);
-        if (parts.length < 3) {
+        assert line != null : "Line to parse cannot be null";
+        String[] fileParts = line.split(SEPARATOR);
+        if (fileParts.length < 3) {
             throw new ChimiException("Invalid line format.");
         }
 
-        String type = parts[0];
-        boolean isDone = parts[1].equals("1");
-        String description = parts[2];
+        String type = fileParts[0];
+        boolean isDone = fileParts[1].equals("1");
+        String taskDescription = fileParts[2];
 
         Task task;
         switch (type) {
             case "T":
-                task = new Todo(description);
+                task = new Todo(taskDescription);
                 break;
             case "D":
-                if (parts.length < 4) {
+                if (fileParts.length < 4) {
                     throw new ChimiException("Invalid deadline format.");
                 }
-                task = new Deadline(description, parts[3]);
+                assert fileParts[3] != null : "Deadline date cannot be null";
+                task = new Deadline(taskDescription, fileParts[3]);
                 break;
             case "E":
-                if (parts.length < 5) {
+                if (fileParts.length < 5) {
                     throw new ChimiException("Invalid event format.");
                 }
-                task = new Event(description, parts[3], parts[4]);
+                assert fileParts[3] != null && fileParts[4] != null : "Event dates cannot be null";
+                task = new Event(taskDescription, fileParts[3], fileParts[4]);
                 break;
             default:
                 throw new ChimiException("Unknown task type: " + type);

@@ -7,6 +7,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import javafx.animation.PauseTransition;
+import javafx.application.Platform;
+import javafx.util.Duration;
+
 /**
  * Controller for the main GUI.
  */
@@ -33,6 +37,9 @@ public class MainWindow extends AnchorPane {
     /** Injects the Chimi instance */
     public void setChimi(Chimi chimi) {
         this.chimi = chimi;
+        dialogContainer.getChildren().add(
+                DialogBox.getChimiDialog(chimi.getWelcome(), dukeImage)
+        );
     }
 
     /**
@@ -45,8 +52,14 @@ public class MainWindow extends AnchorPane {
         String response = chimi.getResponse(input);
         dialogContainer.getChildren().addAll(
                 DialogBox.getUserDialog(input, userImage),
-                DialogBox.getDukeDialog(response, dukeImage)
+                DialogBox.getChimiDialog(response, dukeImage)
         );
         userInput.clear();
+
+        if (input.trim().equalsIgnoreCase("bye")) {
+            PauseTransition pause = new PauseTransition(Duration.seconds(1.5));
+            pause.setOnFinished(event -> Platform.exit());
+            pause.play();
+        }
     }
 }

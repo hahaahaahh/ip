@@ -36,6 +36,10 @@ public class DialogBox extends HBox {
 
         dialog.setText(text);
         displayPicture.setImage(img);
+
+        // Circular clip for profile picture
+        javafx.scene.shape.Circle clip = new javafx.scene.shape.Circle(25, 25, 25);
+        displayPicture.setClip(clip);
     }
 
     /**
@@ -49,13 +53,18 @@ public class DialogBox extends HBox {
     }
 
     public static DialogBox getUserDialog(String text, Image img) {
-        return new DialogBox(text, img);
+        var db = new DialogBox(text, img);
+        db.dialog.getStyleClass().add("user-label");
+        return db;
     }
 
-    public static DialogBox getDukeDialog(String text, Image img) {
+    public static DialogBox getChimiDialog(String text, Image img) {
         var db = new DialogBox(text, img);
         db.flip();
+        db.dialog.getStyleClass().add("duke-label");
+        if (text.startsWith("OOPS!!!") || text.startsWith("Error")) {
+            db.dialog.getStyleClass().add("error-label");
+        }
         return db;
     }
 }
-

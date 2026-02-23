@@ -22,51 +22,46 @@ public class Chimi {
 
     private final Storage storage;
     private TaskList tasks;
-    private final Ui ui;
+    private Ui ui;
 
     /**
      * Constructs a new Chimi application instance.
-     * Initializes the UI, Storage, and attempts to load existing tasks.
+     * Initializes the Storage and attempts to load existing tasks.
+     * The Ui is only created when {@link #run()} is called (CLI mode).
      *
      * @param filePath The file path where tasks are stored.
      */
     public Chimi(String filePath) {
-        ui = new Ui();
         storage = new Storage(filePath);
         try {
             tasks = new TaskList(storage.load());
         } catch (ChimiException e) {
-            ui.showLoadingError();
+            System.err.println("Problem loading file. Starting with an empty list.");
             tasks = new TaskList();
         }
     }
 
     /**
-     * Runs the main application loop.
-     * Handles user input by delegating logic to getResponse().
+     * Runs the main application loop (CLI mode).
+     * Initializes the Ui and handles user input by delegating logic to getResponse().
      */
     public void run() {
+        ui = new Ui();
         ui.showWelcome();
         boolean isExit = false;
 
         while (!isExit) {
-            try {
-                String fullCommand = ui.readCommand();
-                ui.showLine();
-                Command command = Parser.parseCommand(fullCommand);
+            String fullCommand = ui.readCommand();
+            ui.showLine();
 
-                // Logic delegated to getResponse to avoid duplication
-                String response = getResponse(fullCommand);
-                ui.showMessage(response);
+            // Logic delegated to getResponse to avoid duplication
+            String response = getResponse(fullCommand);
+            ui.showMessage(response);
 
-                if (Parser.parseCommand(fullCommand) == Command.BYE) {
-                    isExit = true;
-                }
-            } catch (ChimiException e) {
-                ui.showError(e.getMessage());
-            } finally {
-                ui.showLine();
+            if (fullCommand.trim().equalsIgnoreCase("bye")) {
+                isExit = true;
             }
+            ui.showLine();
         }
     }
 
@@ -94,6 +89,13 @@ public class Chimi {
         }
     }
 
+    /**
+     * Returns the welcome message for the GUI.
+     */
+    public String getWelcome() {
+        return "Hello! I'm Chimi\nWhat can I do for you?";
+    }
+
     // --- Command Handlers ---
 
     private String handleList() {
@@ -115,11 +117,11 @@ public class Chimi {
     }
 
     private String handleFind(String input) throws ChimiException {
-        String[] parts = input.split(" ", 2);
-        if (parts.length < 2) {
+        String[] commandParts = input.split(" ", 2);
+        if (commandParts.length < 2) {
             throw new ChimiException("Please specify a keyword to search for.");
         }
-        String keyword = parts[1].trim();
+        String keyword = commandParts[1].trim();
         ArrayList<Task> found = tasks.findTasks(keyword);
 
         if (found.isEmpty()) {
@@ -169,12 +171,12 @@ public class Chimi {
     }
 
     private int parseIndex(String input) throws ChimiException {
-        String[] parts = input.split(" ");
-        if (parts.length < 2) {
+        String[] commandParts = input.split(" ");
+        if (commandParts.length < 2) {
             throw new ChimiException("Please specify which task to operate on.");
         }
         try {
-            return Integer.parseInt(parts[1]) - 1;
+            return Integer.parseInt(commandParts[1]) - 1;
         } catch (NumberFormatException e) {
             throw new ChimiException("Please enter a valid number.");
         }
@@ -245,4 +247,3 @@ public class Chimi {
         new Chimi("data/chimi.txt").run();
     }
 }
-

@@ -18,7 +18,22 @@
 
 .dialog-label {
     -fx-text-fill: black;
-    -fx-background-color: rgba(255, 255, 255, 0.9);
     -fx-padding: 10;
     -fx-background-radius: 10;
+}
+
+.user-label {
+    -fx-background-color: #ADD8E6; /* Light Blue */
+    -fx-background-radius: 15 15 0 15;
+}
+
+.duke-label {
+    -fx-background-color: #E0E0E0; /* Light Gray */
+    -fx-background-radius: 15 15 15 0;
+}
+
+.error-label {
+    -fx-background-color: #FFCCCC; /* Pale Red */
+    -fx-font-weight: bold;
+    -fx-text-fill: red;
 }
